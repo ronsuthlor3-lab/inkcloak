@@ -1,0 +1,14 @@
+{
+  "name": "inkcloak",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Experimental, unproven in-browser adversarial perturbation for artwork. Not a substitute for Glaze or Nightshade.",
+  "type": "module",
+  "scripts": {
+    "test": "node --test test/core.test.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "license": "MIT"
+}

@@ -1,0 +1,4 @@
+node_modules/
+.claude/
+*.cloaked.png
+.DS_Store

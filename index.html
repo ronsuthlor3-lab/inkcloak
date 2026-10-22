@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Inkcloak (experimental)</title>
+  <meta name="description" content="Experimental, unproven browser tool that adds a faint adversarial perturbation to artwork. Not a substitute for Glaze or Nightshade.">
+  <link rel="icon" href="web/icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="web/style.css">
+</head>
+<body>
+  <header class="top">
+    <div class="brand">
+      <img src="web/icon.svg" alt="" width="36" height="36">
+      <div>
+        <h1>Inkcloak <span class="badge">experimental</span></h1>
+        <p class="tagline" data-i18n="tagline"></p>
+      </div>
+    </div>
+    <div class="controls-top">
+      <div class="lang" role="group" aria-label="Language">
+        <button type="button" data-lang="th">ไทย</button>
+        <button type="button" data-lang="en">EN</button>
+      </div>
+      <button type="button" class="icon-btn" id="theme"></button>
+    </div>
+  </header>
+
+  <section class="warning" role="note" aria-labelledby="warn-title">
+    <h2 id="warn-title"><span aria-hidden="true">⚠</span> <span data-i18n="warnTitle"></span></h2>
+    <ul>
+      <li data-i18n="warn1"></li>
+      <li data-i18n="warn2"></li>
+      <li><span data-i18n="warn3"></span>
+        <a href="https://glaze.cs.uchicago.edu/" target="_blank" rel="noopener">Glaze</a> ·
+        <a href="https://nightshade.cs.uchicago.edu/" target="_blank" rel="noopener">Nightshade</a></li>
+      <li><a href="measure.html" data-i18n="warn4"></a></li>
+    </ul>
+  </section>
+
+  <p class="privacy"><span aria-hidden="true">🔒</span> <span data-i18n="privacy"></span></p>
+
+  <nav class="tabs">
+    <a href="index.html" aria-current="page" data-i18n="navTool"></a>
+    <a href="measure.html" data-i18n="navMeasure"></a>
+  </nav>
+
+  <main class="grid">
+    <div>
+      <div class="card">
+        <label class="drop" id="drop">
+          <input type="file" id="file" accept="image/png,image/jpeg,image/webp">
+          <span class="btn" data-i18n="pick"></span>
+          <div class="muted small" data-i18n="pickHint"></div>
+        </label>
+        <div class="samples">
+          <span class="muted small" data-i18n="orSample"></span>
+          <button type="button" class="secondary" data-sample="landscape" data-i18n="sLandscape"></button>
+          <button type="button" class="secondary" data-sample="portrait" data-i18n="sPortrait"></button>
+          <button type="button" class="secondary" data-sample="lineart" data-i18n="sLineart"></button>
+          <button type="button" class="secondary" data-sample="painterly" data-i18n="sPainterly"></button>
+        </div>
+      </div>
+
+      <div class="card" id="viewer" hidden>
+        <div class="compare" id="compare">
+          <canvas id="cv-before"></canvas>
+          <div class="after-wrap" id="after-wrap"><canvas id="cv-after"></canvas></div>
+          <div class="divider" id="divider"></div>
+          <span class="tag l" data-i18n="before"></span>
+          <span class="tag r" data-i18n="after"></span>
+        </div>
+        <label class="field"><span class="muted small" data-i18n="slider"></span>
+          <input type="range" id="split" min="0" max="100" value="50"></label>
+        <label class="check"><input type="checkbox" id="amplify"> <span data-i18n="amplify"></span></label>
+        <p class="note" id="scaled" hidden></p>
+      </div>
+    </div>
+
+    <div>
+      <div class="card">
+        <label class="field">
+          <span data-i18n="strength"></span>
+          <input type="range" id="eps" min="2" max="16" step="1" value="8">
+          <span class="muted small"><b class="value" id="eps-val">8</b> <span data-i18n="strengthUnit"></span></span>
+        </label>
+        <label class="field">
+          <span data-i18n="steps"></span>
+          <select id="steps">
+            <option value="20" data-i18n="stepsFast"></option>
+            <option value="40" selected data-i18n="stepsNormal"></option>
+            <option value="80" data-i18n="stepsSlow"></option>
+          </select>
+        </label>
+        <button type="button" id="run" disabled data-i18n="run"></button>
+        <progress id="progress" max="1" value="0" hidden></progress>
+        <p class="status" id="status" role="status" aria-live="polite"></p>
+      </div>
+
+      <div class="card" id="results" hidden>
+        <div class="stats">
+          <div class="stat"><div class="k" data-i18n="psnr"></div><div class="v" id="r-psnr">–</div></div>
+          <div class="stat"><div class="k" data-i18n="ssim"></div><div class="v" id="r-ssim">–</div></div>
+          <div class="stat"><div class="k" data-i18n="maxChange"></div><div class="v" id="r-max">–</div></div>
+        </div>
+        <p class="note"><span data-i18n="psnrHint"></span> · <span data-i18n="ssimHint"></span></p>
+        <p class="note" id="preview-note" hidden data-i18n="previewNote"></p>
+        <h3 data-i18n="encTitle"></h3>
+        <p class="small"><span data-i18n="encSim"></span>: <b class="value" id="r-cos">–</b><br>
+          <span data-i18n="encDecoy"></span>: <b class="value" id="r-decoy">–</b></p>
+        <p class="note" data-i18n="encNote"></p>
+        <button type="button" id="download" data-i18n="download"></button>
+      </div>
+
+      <div class="card">
+        <h3 data-i18n="inksealTitle"></h3>
+        <p class="small" data-i18n="inksealBody"></p>
+        <a class="btn secondary" href="https://ronsuthlor3-lab.github.io/inkseal/" target="_blank" rel="noopener" data-i18n="inksealLink"></a>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <span data-i18n="footer"></span> ·
+    <a href="https://github.com/ronsuthlor3-lab/inkcloak">GitHub</a>
+  </footer>
+
+  <script src="vendor/tf.min.js"></script>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
